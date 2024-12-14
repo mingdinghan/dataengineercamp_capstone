@@ -1,0 +1,14 @@
+[
+    {
+        "_meta": {
+            "topic": "orders",
+            "key": "id"
+        },
+        "id": "faker.string.uuid()",
+        "product_id": "faker.helpers.rangeToNumber({ min: 1, max: 10 })",
+        "customer_id":  "faker.helpers.rangeToNumber({ min: 1, max: 3 })",
+        "quantity": "faker.helpers.rangeToNumber({ min: 1, max: 10 })",
+        "total_price": "faker.commerce.price({ min: 10, max: 250})",
+        "created_at": "faker.date.past({ days: 30, refDate: '2024-01-01T00:00:00.000Z' })"
+    }
+]
