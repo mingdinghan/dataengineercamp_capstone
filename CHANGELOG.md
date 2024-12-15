@@ -1,5 +1,80 @@
 ## 2024-12-15
 
+### Create a ksqlDB cluster and query data from Kafka topics
+```sql
+CREATE OR REPLACE STREAM orders_stream(
+    id STRING,
+    product_id INTEGER,
+    customer_id INTEGER,
+    quantity INTEGER,
+    total_price STRING,
+    created_at STRING
+) WITH (
+    KAFKA_TOPIC = 'orders',
+    VALUE_FORMAT = 'JSON'
+);
+
+CREATE OR REPLACE STREAM products_stream(
+    id INTEGER,
+    title STRING,
+    category STRING,
+    vendor STRING,
+    price STRING,
+    description STRING,
+    color STRING,
+    `SIZE` STRING,
+    material STRING
+) WITH (
+    KAFKA_TOPIC = 'products',
+    VALUE_FORMAT = 'JSON'
+);
+
+CREATE OR REPLACE STREAM customers_stream(
+    id INTEGER,
+    name STRING,
+    email STRING,
+    address STRING,
+    city STRING,
+    state STRING,
+    zipcode STRING
+) WITH (
+    KAFKA_TOPIC = 'customers',
+    VALUE_FORMAT = 'JSON'
+);
+```
+
+- get the total revenue from all orders in the past 30 minutes, grouped by product
+```sql
+SELECT
+    product_id,
+    SUM(CAST(total_price AS DOUBLE)) as total_price
+FROM ORDERS_STREAM
+WINDOW tumbling (SIZE 30 MINUTES)
+GROUP BY product_id
+EMIT CHANGES;
+```
+
+![images/ksqldb_tumbling_window.png](images/ksqldb_tumbling_window.png)
+
+- get the total product quantity and revenue from all orders, grouped by product category, within the last 24 hours
+```sql
+CREATE STREAM orders_enriched AS
+  SELECT
+    products.category,
+    SUM(orders.quantity) as total_quantity_per_category,
+    SUM(CAST(orders.total_price AS DOUBLE)) as total_revenue_per_category
+  FROM ORDERS_STREAM as orders
+  INNER JOIN PRODUCTS_STREAM as products
+    WITHIN 24 HOUR
+    ON orders.product_id = products.id
+  GROUP BY products.category
+  EMIT CHANGES;
+```
+
+![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
+
+---
+
 ### Generate fake (but realistic-looking) data to stream into Kafka
 
 - I chose not to use Confluent datagen as the [Avro schema examples](https://github.com/confluentinc/kafka-connect-datagen/tree/master/src/main/resources) look quite restrictive (e.g. limited to Regex parsing, and a pre-defined list of `options`) and do not produce realistic-looking data
