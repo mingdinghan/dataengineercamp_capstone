@@ -1,5 +1,27 @@
 ## 2024-12-15
 
+### Preset visualization with streaming updates
+
+- Configured Preset database connection to point to ClickHouse
+![images/preset_clickhouse_integration.png](images/preset_clickhouse_integration.png)
+
+- Created a Preset dataset to reference the `orders` table in ClickHouse. Created 2 custom metrics
+![images/preset_configure_custom_metrics.png](images/preset_configure_custom_metrics.png)
+
+- Created a Preset dashboard and 3 charts to show
+  - total revenue sliced by `product_id` over time (monthly grain)
+  - total revenue per `customer_id`
+  - total quantity of products purchased per `customer_id`
+    ![images/preset_visualization_01.png](images/preset_visualization_01.png)
+
+- Ran `datagen` to produce 500 more recent orders to Kafka in Confluent Cloud. Refreshed the Preset visualization to show the updated data from ClickHouse streaming ingestion from Confluent Cloud.
+  - Before
+    ![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+  - After
+    ![images/clickhouse_clickpipes_updated.png](images/clickhouse_clickpipes_updated.png)
+
+    ![images/preset_visualization_02.png](images/preset_visualization_02.png)
+
 ### ClickHouse
 
 ```sql
