@@ -57,3 +57,5 @@ datagen \
     --format json \
     --number 50
 ```
+
+![images/ccloud_orders.png](images/ccloud_orders.png)
