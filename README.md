@@ -6,6 +6,7 @@ This is a demo project to create a streaming ELT pipeline using Kafka, Confluent
 It simulates an e-commerce store which has products, orders and customers
 - data sources: `Product`, `Order` and `Customer`. These correspond to simulated records from operational databases from an e-commerce store
 - source data is generated using [datagen](https://github.com/MaterializeInc/datagen) (which leverages on the [faker.js](https://fakerjs.dev/) library) and streamed into a Kafka cluster on Confluent Cloud
+  - bonus: automated producing of data to Kafka cluster from an ECS task running `datagen`
 - stream processing using ksqldb / FlinkSQL
   - bonus: state-ful stream processing of live inventory using FlinkSQL
 - output data is streamed into Clickhouse
@@ -20,3 +21,15 @@ What users would find your dataset useful?
 ### System Architecture
 
 t.b.d
+
+### Selected Screenshots
+(more details in [CHANGELOG.md](CHANGELOG.md))
+
+- Stream ingestion of `orders` into Kafka cluster in Confluent Cloud
+![images/ccloud_orders.png](images/ccloud_orders.png)
+
+- Stream-to-stream join queries using ksqldb with a 24-hour window
+![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
+
+- Preset visualization of ClickHouse data automatically updated with new streaming data
+![images/preset_visualization_02.png](images/preset_visualization_02.png)

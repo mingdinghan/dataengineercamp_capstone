@@ -56,7 +56,7 @@
         </td>
         <td>
             <li>3 transformation techniques: 5%</li>
-            <li>5 transformation techniques: 7%</li>
+            <li>✅ 5 transformation techniques: 7%</li>
             <li>7 transformation techniques: 10%</li>
         </td>
     </tr>
@@ -67,7 +67,7 @@
             <li>Aggregations with time windows i.e. tumbling, hopping, session windows</li>
         </td>
         <td>
-            <li>Streaming transformations: 5%</li>
+            <li>✅ Streaming transformations: 5%</li>
         </td>
     </tr>
     <tr>
@@ -106,7 +106,7 @@
             [Batch | Streaming] Create a data application that generates insights or predictions for end-users (e.g. a Preset dashboard, a real-time ML application):
         </td>
         <td>
-            <li>Semantic Layer and Dashboard, or ML model inference, or other data apps (please discuss with an instructor): 10%</li>
+            <li>✅ Semantic Layer and Dashboard, or ML model inference, or other data apps (please discuss with an instructor): 10%</li>
         </td>
     </tr>
     <tr>
@@ -134,9 +134,9 @@
             <li>Pull request and review</li>
         </td>
         <td>
-            <li>Git commits and push only: 2.5%</li>
-            <li>+ Git branching: 4%</li>
-            <li>+ Pull request and review: 5%</li>
+            <li>✅ Git commits and push only: 2.5%</li>
+            <li>✅ + Git branching: 4%</li>
+            <li>✅ + Pull request and review: 5%</li>
         </td>
     </tr>
     <tr>

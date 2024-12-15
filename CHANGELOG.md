@@ -1,5 +1,170 @@
 ## 2024-12-15
 
+### Preset visualization with streaming updates
+
+- Configured Preset database connection to point to ClickHouse
+![images/preset_clickhouse_integration.png](images/preset_clickhouse_integration.png)
+
+- Created a Preset dataset to reference the `orders` table in ClickHouse. Created 2 custom metrics
+![images/preset_configure_custom_metrics.png](images/preset_configure_custom_metrics.png)
+
+- Created a Preset dashboard and 3 charts to show
+  - total revenue sliced by `product_id` over time (monthly grain)
+  - total revenue per `customer_id`
+  - total quantity of products purchased per `customer_id`
+    ![images/preset_visualization_01.png](images/preset_visualization_01.png)
+
+- Ran `datagen` to produce 500 more recent orders to Kafka in Confluent Cloud. Refreshed the Preset visualization to show the updated data from ClickHouse streaming ingestion from Confluent Cloud.
+  - Before
+    ![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+  - After
+    ![images/clickhouse_clickpipes_updated.png](images/clickhouse_clickpipes_updated.png)
+
+    ![images/preset_visualization_02.png](images/preset_visualization_02.png)
+
+### ClickHouse
+
+```sql
+CREATE TABLE orders (
+    id String,
+    product_id UInt64,
+    customer_id UInt64,
+    quantity UInt64,
+    total_price Float64,
+    created_at DateTime
+) ENGINE = MergeTree ORDER BY (product_id, customer_id, created_at)
+
+CREATE TABLE products (
+    id UInt64,
+    title String,
+    category String,
+    vendor String,
+    price Float64,
+    description String,
+    color String,
+    size String,
+    material String
+) ENGINE = MergeTree ORDER BY (id)
+
+CREATE TABLE customers (
+    id UInt64,
+    name String,
+    email String,
+    address String,
+    city String,
+    state String,
+    zipcode String
+) ENGINE = MergeTree ORDER BY (id)
+```
+
+![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+![images/clickhouse_ingestion.png](images/clickhouse_ingestion.png)
+
+- Query for the product categories that generated the most revenue
+```sql
+select
+    products.category,
+    SUM(orders.quantity) as total_quantity,
+    SUM(orders.total_price) as total_revenue
+from orders
+join products
+on orders.product_id = products.id
+GROUP BY products.category
+ORDER BY total_revenue DESC
+```
+![images/clickhouse_join_query_products.png](images/clickhouse_join_query_products.png)
+
+- Query for the customers that spent the most
+```sql
+select
+    customers.name,
+    SUM(orders.quantity) as total_quantity,
+    SUM(orders.total_price) as total_revenue
+from orders
+join customers
+on orders.customer_id = customers.id
+GROUP BY customers.name
+ORDER BY total_revenue DESC
+```
+![images/clickhouse_join_query_customers.png](images/clickhouse_join_query_customers.png)
+
+---
+
+### Create a ksqlDB cluster and query data from Kafka topics
+```sql
+CREATE OR REPLACE STREAM orders_stream(
+    id STRING,
+    product_id INTEGER,
+    customer_id INTEGER,
+    quantity INTEGER,
+    total_price STRING,
+    created_at STRING
+) WITH (
+    KAFKA_TOPIC = 'orders',
+    VALUE_FORMAT = 'JSON'
+);
+
+CREATE OR REPLACE STREAM products_stream(
+    id INTEGER,
+    title STRING,
+    category STRING,
+    vendor STRING,
+    price STRING,
+    description STRING,
+    color STRING,
+    `SIZE` STRING,
+    material STRING
+) WITH (
+    KAFKA_TOPIC = 'products',
+    VALUE_FORMAT = 'JSON'
+);
+
+CREATE OR REPLACE STREAM customers_stream(
+    id INTEGER,
+    name STRING,
+    email STRING,
+    address STRING,
+    city STRING,
+    state STRING,
+    zipcode STRING
+) WITH (
+    KAFKA_TOPIC = 'customers',
+    VALUE_FORMAT = 'JSON'
+);
+```
+
+- get the total revenue from all orders in the past 30 minutes, grouped by product
+```sql
+SELECT
+    product_id,
+    SUM(CAST(total_price AS DOUBLE)) as total_price
+FROM ORDERS_STREAM
+WINDOW tumbling (SIZE 30 MINUTES)
+GROUP BY product_id
+EMIT CHANGES;
+```
+
+![images/ksqldb_tumbling_window.png](images/ksqldb_tumbling_window.png)
+
+- get the total product quantity and revenue from all orders, grouped by product category, within the last 24 hours
+```sql
+CREATE STREAM orders_enriched AS
+  SELECT
+    products.category,
+    SUM(orders.quantity) as total_quantity_per_category,
+    SUM(CAST(orders.total_price AS DOUBLE)) as total_revenue_per_category
+  FROM ORDERS_STREAM as orders
+  INNER JOIN PRODUCTS_STREAM as products
+    WITHIN 24 HOUR
+    ON orders.product_id = products.id
+  GROUP BY products.category
+  EMIT CHANGES;
+```
+
+![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
+
+---
+
 ### Generate fake (but realistic-looking) data to stream into Kafka
 
 - I chose not to use Confluent datagen as the [Avro schema examples](https://github.com/confluentinc/kafka-connect-datagen/tree/master/src/main/resources) look quite restrictive (e.g. limited to Regex parsing, and a pre-defined list of `options`) and do not produce realistic-looking data
