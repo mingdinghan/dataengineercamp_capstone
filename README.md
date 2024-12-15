@@ -1,14 +1,11 @@
-## ecommerce streaming ELT Demo
+## DataEngineerCamp Capstone Project - An e-commerce streaming ELT Demo
 
 ### Introduction
 This is a demo project to create a streaming ELT pipeline using Kafka, Confluent Cloud, ClickHouse and Preset.
 
 It simulates an e-commerce store which has products, orders and customers
-- data sources
-  - `Product` records are seeded from publicly-available data from [Shopify example dataset](https://github.com/shopifypartners/shopify-product-csvs-and-images/tree/master/csv-files), based on a subset of fields in the [Shopify Product schema](https://shopify.dev/docs/api/storefront/2024-10/objects/Product)
-  - `Order` records are created using DataGen, based on a subset of fields in the [Shopify Order schema](https://shopify.dev/docs/api/storefront/2024-10/objects/Order)
-  - `Customer` records are created using DataGen, based on a subset of fields in the [Shopify Customer schema](https://shopify.dev/docs/api/storefront/2024-10/objects/Customer)
-- source data is streamed into Kafka on Confluent Cloud
+- data sources: `Product`, `Order` and `Customer`. These correspond to simulated records from operational databases from an e-commerce store
+- source data is generated using [datagen](https://github.com/MaterializeInc/datagen) (which leverages on the [faker.js](https://fakerjs.dev/) library) and streamed into a Kafka cluster on Confluent Cloud
 - stream processing using ksqldb / FlinkSQL
   - bonus: state-ful stream processing of live inventory using FlinkSQL
 - output data is streamed into Clickhouse
