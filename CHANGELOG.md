@@ -1,5 +1,73 @@
 ## 2024-12-15
 
+### ClickHouse
+
+```sql
+CREATE TABLE orders (
+    id String,
+    product_id UInt64,
+    customer_id UInt64,
+    quantity UInt64,
+    total_price Float64,
+    created_at DateTime
+) ENGINE = MergeTree ORDER BY (product_id, customer_id, created_at)
+
+CREATE TABLE products (
+    id UInt64,
+    title String,
+    category String,
+    vendor String,
+    price Float64,
+    description String,
+    color String,
+    size String,
+    material String
+) ENGINE = MergeTree ORDER BY (id)
+
+CREATE TABLE customers (
+    id UInt64,
+    name String,
+    email String,
+    address String,
+    city String,
+    state String,
+    zipcode String
+) ENGINE = MergeTree ORDER BY (id)
+```
+
+![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+![images/clickhouse_ingestion.png](images/clickhouse_ingestion.png)
+
+- Query for the product categories that generated the most revenue
+```sql
+select
+    products.category,
+    SUM(orders.quantity) as total_quantity,
+    SUM(orders.total_price) as total_revenue
+from orders
+join products
+on orders.product_id = products.id
+GROUP BY products.category
+ORDER BY total_revenue DESC
+```
+![images/clickhouse_join_query_products.png](images/clickhouse_join_query_products.png)
+
+- Query for the customers that spent the most
+```sql
+select
+    customers.name,
+    SUM(orders.quantity) as total_quantity,
+    SUM(orders.total_price) as total_revenue
+from orders
+join customers
+on orders.customer_id = customers.id
+GROUP BY customers.name
+ORDER BY total_revenue DESC
+```
+![images/clickhouse_join_query_customers.png](images/clickhouse_join_query_customers.png)
+
+---
+
 ### Create a ksqlDB cluster and query data from Kafka topics
 ```sql
 CREATE OR REPLACE STREAM orders_stream(
