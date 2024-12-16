@@ -1,3 +1,31 @@
+## 2024-12-16
+
+- Run [datagen](https://github.com/MaterializeInc/datagen) in pre-built Docker containers
+
+```bash
+docker pull materialize/datagen
+```
+
+- Produce the bootstrapped `products`, `customers` and `orders` records
+```bash
+docker run \
+  --rm -it \
+  -v ${PWD}/.env:/app/.env \
+  -v ${PWD}/datagen/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
+      materialize/datagen -s ecommerce_bootstrapped_data.json -n 1 --dry-run
+```
+
+- Periodically (or on-demand), produce new `orders` records
+```bash
+docker run \
+  --rm -it \
+  -v ${PWD}/.env:/app/.env \
+  -v ${PWD}/datagen/ecommerce_orders.json:/app/ecommerce_orders.json \
+      materialize/datagen -s ecommerce_orders.json -n 1 --dry-run
+```
+
+---
+
 ## 2024-12-15
 
 ### Preset visualization with streaming updates
