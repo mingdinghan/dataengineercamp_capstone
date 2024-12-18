@@ -1,3 +1,12 @@
+## 2024-12-18
+
+### Github Actions Integration
+- Set up AWS IAM role `aws_github_iam_role`
+![images/cicd_aws_github_iam_role.png](images/cicd_aws_github_iam_role.png)
+
+- Create `.github/workflows/s3-ls.yml` to test using GH actions to list AWS S3 buckets
+
+---
 ## 2024-12-17
 
 ### Manually set up an EC2 instance to periodically produce data to Confluent Cloud
