@@ -22,6 +22,14 @@ What users would find your dataset useful?
 
 t.b.d
 
+### Build
+
+- Create a Kafka cluster in Confluent Cloud and generate an API key
+- Clone `.env.example` into `.env` and fill in the Kafka cluster credentials
+```bash
+source .env
+```
+
 ### Selected Screenshots
 (more details in [CHANGELOG.md](CHANGELOG.md))
 

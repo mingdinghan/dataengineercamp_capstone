@@ -1,3 +1,126 @@
+## 2024-12-17
+
+### Manually set up an EC2 instance to periodically produce data to Confluent Cloud
+
+- Since the ECS task could not start up with the `datagen` container image, an alternative is to do the following:
+  - SSH into the EC2 instance
+  - Copy the files `.env`, `ecommerce_bootstrapped_data.json` and `ecommerce_orders.json` into the EC2 instance
+  - Run `source .env`
+  - Pull the container image (TODO: replace with ECR link - need to [enable authentication via IAM role](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-pull-ecr-image.html))
+    ```bash
+    docker pull materialize/datagen
+    ```
+  - verify that the container can be used to produce data to Confluent Cloud
+    ```bash
+    docker run \
+    -v ${PWD}/.env:/app/.env \
+    -v ${PWD}/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
+        materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+
+    docker run \
+    -v ${HOME}/.env:/app/.env \
+    -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
+        materialize/datagen -s ecommerce_orders.json -n 50
+    ```
+  - This shows that the problem was with running the `datagen` container image within an ECS task
+
+- create a Shell script and schedule it to produce data periodically
+  - Create the script: `vi stream_produce.sh` and paste the following:
+    ```bash
+    now="$(date +"%T")"
+    echo "Current Time: $now"
+    echo "Running 'datagen ecommerce_orders.json'"
+
+    #!/usr/bin/env bash
+
+    docker run \
+      -v ${HOME}/.env:/app/.env \
+      -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
+          materialize/datagen -s ecommerce_orders.json -n 50
+
+    echo "All done"
+    ```
+
+  - Execute the shell script to verify that it works
+    ```bash
+    sh stream_produce.sh
+    ```
+
+  - Set up crontab to run this shell script every 2 minutes
+    ```bash
+    crontab -e
+    */2 * * * * sh $HOME/stream_produce.sh >> $HOME/cron.log
+    ```
+  - Verify that the Kafka cluster sees new orders produced every 2 minutes
+
+
+- The above steps effectively simulate a periodic ECS task that runs a Docker container to produce to Confluent Cloud
+- They also simulate a Confluent `Datagen Source` connector
+  - periodically producing data into a Kafka cluster
+  - in a highly-customisable manner, with record `id` fields having referential integrity
+  - with realistic-looking data generated using Faker.js
+
+![images/ccloud_data_produced_periodically.png](images/ccloud_data_produced_periodically.png)
+
+---
+
+## 2024-12-16
+
+### Run [datagen](https://github.com/MaterializeInc/datagen) locally using pre-built [Docker container image](https://hub.docker.com/r/materialize/datagen/tags)
+
+```bash
+docker pull materialize/datagen
+```
+
+- Produce the bootstrapped `products`, `customers` and `orders` records
+```bash
+docker run \
+  --rm -it \
+  -v ${PWD}/.env:/app/.env \
+  -v ${PWD}/datagen/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
+      materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+```
+
+- Periodically (or on-demand), produce new `orders` records
+```bash
+docker run \
+  --rm -it \
+  -v ${PWD}/.env:/app/.env \
+  -v ${PWD}/datagen/ecommerce_orders.json:/app/ecommerce_orders.json \
+      materialize/datagen -s ecommerce_orders.json -n 50
+```
+
+### Deploy to AWS
+- Deployed the pre-built [Docker container image](https://hub.docker.com/r/materialize/datagen/tags) to ECR
+  ```bash
+  docker tag materialize/datagen:latest ${CONTAINER_REGISTRY_URL}/materialize/datagen:latest
+
+  docker push ${CONTAINER_REGISTRY_URL}/materialize/datagen:latest
+  ```
+  ![images/aws_ecr_repository.png](images/aws_ecr_repository.png)
+
+
+- Stored credentials as an `.env` file in S3
+
+  ![images/aws_s3_env_file.png](images/aws_s3_env_file.png)
+
+
+- Configured IAM role to read from above S3 bucket and `.env` file
+
+  ![images/aws_iam_role_ecs_execution_read_s3.png](images/aws_iam_role_ecs_execution_read_s3.png)
+
+
+- Provisioned an ECS cluster and task definition with the ECR ARN, path to `.env` file in S3 and IAM role
+  ![images/aws_ecs_cluster.png](images/aws_ecs_cluster.png)
+  ![images/aws_ecs_task_definition.png](images/aws_ecs_task_definition.png)
+
+- Started an ECS task - however it failed to start with `exec: \"datagen\": executable file not found in $PATH: unknown` error
+  ![images/aws_ecs_task_failed_to_start.png](images/aws_ecs_task_failed_to_start.png)
+  ![images/aws_docker_container_logs.png](images/aws_docker_container_logs.png)
+
+
+---
+
 ## 2024-12-15
 
 ### Preset visualization with streaming updates
