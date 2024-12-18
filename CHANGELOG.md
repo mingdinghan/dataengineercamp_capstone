@@ -5,6 +5,7 @@
 ![images/cicd_aws_github_iam_role.png](images/cicd_aws_github_iam_role.png)
 
 - Create `.github/workflows/s3-ls.yml` to test using GH actions to list AWS S3 buckets
+![images/cicd_gh_actions_s3_ls.png](images/cicd_gh_actions_s3_ls.png)
 
 ---
 ## 2024-12-17
