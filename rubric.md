@@ -15,7 +15,7 @@
         <td>
             <li>Static dataset: 5%</li>
             <li>✅ Live dataset: 10%</li>
-            <li>TODO: Run in a Docker container in ECS </li>
+            <li>✅ Run in a Docker container in ECS (EC2 instance)</li>
         </td>
     </tr>
     <tr>
@@ -123,7 +123,7 @@
             <li>Real-time database hosted on a cloud service (e.g. Clickhouse cloud)</li>
         </td>
         <td>
-            Entire solution hosted on cloud services: 10%
+            ✅ Entire solution hosted on cloud services: 10%
         </td>
     </tr>
     <tr>

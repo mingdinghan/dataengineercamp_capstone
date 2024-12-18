@@ -1,3 +1,69 @@
+## 2024-12-17
+
+### Manually set up an EC2 instance to periodically produce data to Confluent Cloud
+
+- Since the ECS task could not start up with the `datagen` container image, an alternative is to do the following:
+  - SSH into the EC2 instance
+  - Copy the files `.env`, `ecommerce_bootstrapped_data.json` and `ecommerce_orders.json` into the EC2 instance
+  - Run `source .env`
+  - Pull the container image (TODO: replace with ECR link - need to [enable authentication via IAM role](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-pull-ecr-image.html))
+    ```bash
+    docker pull materialize/datagen
+    ```
+  - verify that the container can be used to produce data to Confluent Cloud
+    ```bash
+    docker run \
+    -v ${PWD}/.env:/app/.env \
+    -v ${PWD}/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
+        materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+
+    docker run \
+    -v ${HOME}/.env:/app/.env \
+    -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
+        materialize/datagen -s ecommerce_orders.json -n 50
+    ```
+  - This shows that the problem was with running the `datagen` container image within an ECS task
+
+- create a Shell script and schedule it to produce data periodically
+  - Create the script: `vi stream_produce.sh` and paste the following:
+    ```bash
+    now="$(date +"%T")"
+    echo "Current Time: $now"
+    echo "Running 'datagen ecommerce_orders.json'"
+
+    #!/usr/bin/env bash
+
+    docker run \
+      -v ${HOME}/.env:/app/.env \
+      -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
+          materialize/datagen -s ecommerce_orders.json -n 50
+
+    echo "All done"
+    ```
+
+  - Execute the shell script to verify that it works
+    ```bash
+    sh stream_produce.sh
+    ```
+
+  - Set up crontab to run this shell script every 2 minutes
+    ```bash
+    crontab -e
+    */2 * * * * sh $HOME/stream_produce.sh >> $HOME/cron.log
+    ```
+  - Verify that the Kafka cluster sees new orders produced every 2 minutes
+
+
+- The above steps effectively simulate a periodic ECS task that runs a Docker container to produce to Confluent Cloud
+- They also simulate a Confluent `Datagen Source` connector
+  - periodically producing data into a Kafka cluster
+  - in a highly-customisable manner, with record `id` fields having referential integrity
+  - with realistic-looking data generated using Faker.js
+
+![images/ccloud_data_produced_periodically.png](images/ccloud_data_produced_periodically.png)
+
+---
+
 ## 2024-12-16
 
 ### Run [datagen](https://github.com/MaterializeInc/datagen) locally using pre-built [Docker container image](https://hub.docker.com/r/materialize/datagen/tags)
