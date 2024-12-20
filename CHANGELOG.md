@@ -1,3 +1,45 @@
+## 2024-12-20
+
+- Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)
+
+- Configure `.env` with the authentication details of the ClickHouse database
+
+```bash
+source ../../../.env
+
+dbt debug
+
+dbt run
+#  Found 3 models, 3 sources, 466 macros
+#  
+#  Concurrency: 1 threads (target='dev')
+#  
+#  1 of 3 START sql table model `default`.`customers` ............................. [RUN]
+#  1 of 3 OK created sql table model `default`.`customers` ........................ [OK in 0.65s]
+#  2 of 3 START sql table model `default`.`orders` ................................ [RUN]
+#  2 of 3 OK created sql table model `default`.`orders` ........................... [OK in 0.65s]
+#  3 of 3 START sql table model `default`.`products` .............................. [RUN]
+#  3 of 3 OK created sql table model `default`.`products` ......................... [OK in 0.65s]
+#  
+#  Finished running 3 table models in 0 hours 0 minutes and 2.94 seconds (2.94s).
+#  
+#  Completed successfully
+#  
+#  Done. PASS=3 WARN=0 ERROR=0 SKIP=0 TOTAL=3
+```
+
+- This creates `table` materializations into the destination `ecommerce_etl` database (i.e. `schema`) in ClickHouse
+- Models under `staging` folder are intended to replicate raw data tables in the `default` schema (under `sources.yml`) which were ingested from Kafka streams
+  - These `staging` models are meant to perform simple data cleaning, such as type conversion, formatting and row deduplication
+
+- NOTE:
+From ClickHouse documentation [Description of ClickHouse Profile Fields](https://docs.getdbt.com/docs/core/connect-data-platform/clickhouse-setup#description-of-clickhouse-profile-fields), field `schema`:
+
+```
+Required. A ClickHouse's database name. The dbt model database.schema.table is not compatible with ClickHouse because ClickHouse does not support a schema. So we use a simple model schema.table, where schema is the ClickHouse's database. We don't recommend using the default database.
+```
+
+---
 ## 2024-12-18
 
 ### Github Actions Integration

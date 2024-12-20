@@ -1,0 +1,11 @@
+ecommerce_etl:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      schema: '{{ env_var("CLICKHOUSE_DATABASE") }}'
+      host: '{{ env_var("CLICKHOUSE_HOST") }}'
+      port: 8443
+      user: '{{ env_var("CLICKHOUSE_USERNAME") }}'
+      password: '{{ env_var("CLICKHOUSE_PASSWORD") }}'
+      secure: true
