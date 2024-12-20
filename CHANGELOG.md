@@ -39,6 +39,28 @@ From ClickHouse documentation [Description of ClickHouse Profile Fields](https:/
 Required. A ClickHouse's database name. The dbt model database.schema.table is not compatible with ClickHouse because ClickHouse does not support a schema. So we use a simple model schema.table, where schema is the ClickHouse's database. We don't recommend using the default database.
 ```
 
+- Add `intermediate` models materialized as `views`
+
+```bash
+dbt run
+#  Found 5 models, 3 sources, 466 macros
+#  
+#  Concurrency: 1 threads (target='dev')
+#  
+#  1 of 5 START sql table model `default`.`customers` ............................. [RUN]
+#  1 of 5 OK created sql table model `default`.`customers` ........................ [OK in 0.55s]
+#  2 of 5 START sql view model `default`.`customers_by_revenue` ................... [RUN]
+#  2 of 5 OK created sql view model `default`.`customers_by_revenue` .............. [OK in 0.16s]
+#  3 of 5 START sql table model `default`.`orders` ................................ [RUN]
+#  3 of 5 OK created sql table model `default`.`orders` ........................... [OK in 0.48s]
+#  4 of 5 START sql table model `default`.`products` .............................. [RUN]
+#  4 of 5 OK created sql table model `default`.`products` ......................... [OK in 0.46s]
+#  5 of 5 START sql view model `default`.`product_categories_by_revenue` .......... [RUN]
+#  5 of 5 OK created sql view model `default`.`product_categories_by_revenue` ..... [OK in 0.12s]
+#  
+#  Finished running 3 table models, 2 view models in 0 hours 0 minutes and 2.74 seconds (2.74s).
+```
+
 ---
 ## 2024-12-18
 
