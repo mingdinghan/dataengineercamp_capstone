@@ -33,6 +33,7 @@ source .env
 ### Selected Screenshots
 (more details in [CHANGELOG.md](CHANGELOG.md))
 
+Stream Ingestion and Processing
 - Stream ingestion of `orders` into Kafka cluster in Confluent Cloud
 ![images/ccloud_orders.png](images/ccloud_orders.png)
 
@@ -41,3 +42,10 @@ source .env
 
 - Preset visualization of ClickHouse data automatically updated with new streaming data
 ![images/preset_visualization_02.png](images/preset_visualization_02.png)
+
+CI/CD:
+- On creating/updating a pull request to `main`, run `sqlfluff` linter and `dbt test` pointing to `dev` ClickHouse tables
+![images/cicd_gh_actions_dbt_test.png](images/cicd_gh_actions_dbt_test.png)
+
+- On merge to `main`, run `dbt run --target prod` to update `prod` ClickHouse tables
+![images/cicd_gh_actions_dbt-run-on-merge.png](images/cicd_gh_actions_dbt-run-on-merge.png)

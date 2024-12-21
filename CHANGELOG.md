@@ -4,6 +4,8 @@
   - on merge to `main`, call GH workflow `dbt-run-on-merge` to deploy to production ClickHouse tables
   - [Reference](https://dbtips.substack.com/p/run-dbt-with-github-actions)
 
+![images/cicd_gh_actions_dbt-run-on-merge.png](images/cicd_gh_actions_dbt-run-on-merge.png)
+
 -----------
 
 - Add data quality tests
