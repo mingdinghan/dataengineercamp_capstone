@@ -45,6 +45,13 @@ sqlfluff lint transform/dbt/ecommerce_etl
 # All Finished 📜 🎉!
 ```
 
+- Configure GitHub Actions to run sqlfluff
+  - Setup ENVVARs as [GitHub Actions secrets](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#creating-configuration-variables-for-a-repository)
+  - Also see [reference: secrets are safe to use in public repositories](https://stackoverflow.com/a/62143130)
+
+![images/cicd_gh_actions_sqlfluff_lint.png](images/cicd_gh_actions_sqlfluff_lint.png)
+
+
 ## 2024-12-20
 
 - Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)
