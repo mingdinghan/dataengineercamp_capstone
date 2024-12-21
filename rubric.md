@@ -90,7 +90,7 @@
         </td>
         <td>
             <li>2 data quality tests: 5% </li>
-            <li>5 data quality tests: 10% </li>
+            <li>✅ 5 data quality tests: 10% </li>
         </td>
     </tr>
     <tr>
@@ -146,8 +146,8 @@
             <li>CD - build and deploy code to a target environment (e.g. preprod, and prod)</li>
         </td>
         <td>
-            <li>CI pipeline with build and tests: 5%</li>
-            <li>+ CD pipeline with deployment of application code to target environment: 10%</li>
+            <li>✅ CI pipeline with build and tests: 5%</li>
+            <li>✅ + CD pipeline with deployment of application code to target environment: 10%</li>
         </td>
     </tr>
     <tr>

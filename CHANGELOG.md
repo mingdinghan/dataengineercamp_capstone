@@ -1,5 +1,11 @@
 ## 2024-12-21
 
+- Configure Continuous Deployment using GitHub Actions
+  - on merge to `main`, call GH workflow `dbt-run-on-merge` to deploy to production ClickHouse tables
+  - [Reference](https://dbtips.substack.com/p/run-dbt-with-github-actions)
+
+-----------
+
 - Add data quality tests
 
 ```bash
