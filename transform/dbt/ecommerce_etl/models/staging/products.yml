@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: products
+    columns:
+      - name: id
+        description: The product id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: title
+        description: The product title
+        data_tests:
+          - not_null
+
+      - name: price
+        description: The product price
+        data_tests:
+          - not_null

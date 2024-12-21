@@ -1,3 +1,126 @@
+## 2024-12-21
+
+- Add data quality tests
+
+```bash
+# 1 of 12 START test not_null_customers_email .................................... [RUN]
+# 1 of 12 PASS not_null_customers_email .......................................... [PASS in 0.21s]
+# 2 of 12 START test not_null_customers_id ....................................... [RUN]
+# 2 of 12 PASS not_null_customers_id ............................................. [PASS in 0.09s]
+# 3 of 12 START test not_null_customers_name ..................................... [RUN]
+# 3 of 12 PASS not_null_customers_name ........................................... [PASS in 0.03s]
+# 4 of 12 START test not_null_orders_customer_id ................................. [RUN]
+# 4 of 12 PASS not_null_orders_customer_id ....................................... [PASS in 0.02s]
+# 5 of 12 START test not_null_orders_id .......................................... [RUN]
+# 5 of 12 PASS not_null_orders_id ................................................ [PASS in 0.03s]
+# 6 of 12 START test not_null_orders_product_id .................................. [RUN]
+# 6 of 12 PASS not_null_orders_product_id ........................................ [PASS in 0.03s]
+# 7 of 12 START test not_null_products_id ........................................ [RUN]
+# 7 of 12 PASS not_null_products_id .............................................. [PASS in 0.02s]
+# 8 of 12 START test not_null_products_price ..................................... [RUN]
+# 8 of 12 PASS not_null_products_price ........................................... [PASS in 0.03s]
+# 9 of 12 START test not_null_products_title ..................................... [RUN]
+# 9 of 12 PASS not_null_products_title ........................................... [PASS in 0.03s]
+# 10 of 12 START test unique_customers_id ........................................ [RUN]
+# 10 of 12 PASS unique_customers_id .............................................. [PASS in 0.03s]
+# 11 of 12 START test unique_orders_id ........................................... [RUN]
+# 11 of 12 PASS unique_orders_id ................................................. [PASS in 0.03s]
+# 12 of 12 START test unique_products_id ......................................... [RUN]
+# 12 of 12 PASS unique_products_id ............................................... [PASS in 0.02s]
+# 
+# Finished running 12 data tests in 0 hours 0 minutes and 1.49 seconds (1.49s).
+# 
+# Completed successfully
+# 
+# Done. PASS=12 WARN=0 ERROR=0 SKIP=0 TOTAL=12
+```
+
+- Install and configure sqlfluff for linting
+
+```bash
+sqlfluff lint transform/dbt/ecommerce_etl
+# === [dbt templater] Sorting Nodes...
+# === [dbt templater] Compiling dbt project...
+# === [dbt templater] Project Compiled.
+# All Finished 📜 🎉!
+```
+
+- Configure GitHub Actions to run sqlfluff
+  - Setup ENVVARs as [GitHub Actions secrets](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#creating-configuration-variables-for-a-repository)
+  - Also see [reference: secrets are safe to use in public repositories](https://stackoverflow.com/a/62143130)
+
+![images/cicd_gh_actions_sqlfluff_lint.png](images/cicd_gh_actions_sqlfluff_lint.png)
+
+
+- Run `dbt test` in GitHub Actions
+
+![images/cicd_gh_actions_dbt_test.png](images/cicd_gh_actions_dbt_test.png)
+
+
+## 2024-12-20
+
+- Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)
+
+- Configure `.env` with the authentication details of the ClickHouse database
+
+```bash
+source ../../../.env
+
+dbt debug
+
+dbt run
+#  Found 3 models, 3 sources, 466 macros
+#  
+#  Concurrency: 1 threads (target='dev')
+#  
+#  1 of 3 START sql table model `default`.`customers` ............................. [RUN]
+#  1 of 3 OK created sql table model `default`.`customers` ........................ [OK in 0.65s]
+#  2 of 3 START sql table model `default`.`orders` ................................ [RUN]
+#  2 of 3 OK created sql table model `default`.`orders` ........................... [OK in 0.65s]
+#  3 of 3 START sql table model `default`.`products` .............................. [RUN]
+#  3 of 3 OK created sql table model `default`.`products` ......................... [OK in 0.65s]
+#  
+#  Finished running 3 table models in 0 hours 0 minutes and 2.94 seconds (2.94s).
+#  
+#  Completed successfully
+#  
+#  Done. PASS=3 WARN=0 ERROR=0 SKIP=0 TOTAL=3
+```
+
+- This creates `table` materializations into the destination `ecommerce_etl` database (i.e. `schema`) in ClickHouse
+- Models under `staging` folder are intended to replicate raw data tables in the `default` schema (under `sources.yml`) which were ingested from Kafka streams
+  - These `staging` models are meant to perform simple data cleaning, such as type conversion, formatting and row deduplication
+
+- NOTE:
+From ClickHouse documentation [Description of ClickHouse Profile Fields](https://docs.getdbt.com/docs/core/connect-data-platform/clickhouse-setup#description-of-clickhouse-profile-fields), field `schema`:
+
+```
+Required. A ClickHouse's database name. The dbt model database.schema.table is not compatible with ClickHouse because ClickHouse does not support a schema. So we use a simple model schema.table, where schema is the ClickHouse's database. We don't recommend using the default database.
+```
+
+- Add `intermediate` models materialized as `views`
+
+```bash
+dbt run
+#  Found 5 models, 3 sources, 466 macros
+#  
+#  Concurrency: 1 threads (target='dev')
+#  
+#  1 of 5 START sql table model `default`.`customers` ............................. [RUN]
+#  1 of 5 OK created sql table model `default`.`customers` ........................ [OK in 0.55s]
+#  2 of 5 START sql view model `default`.`customers_by_revenue` ................... [RUN]
+#  2 of 5 OK created sql view model `default`.`customers_by_revenue` .............. [OK in 0.16s]
+#  3 of 5 START sql table model `default`.`orders` ................................ [RUN]
+#  3 of 5 OK created sql table model `default`.`orders` ........................... [OK in 0.48s]
+#  4 of 5 START sql table model `default`.`products` .............................. [RUN]
+#  4 of 5 OK created sql table model `default`.`products` ......................... [OK in 0.46s]
+#  5 of 5 START sql view model `default`.`product_categories_by_revenue` .......... [RUN]
+#  5 of 5 OK created sql view model `default`.`product_categories_by_revenue` ..... [OK in 0.12s]
+#  
+#  Finished running 3 table models, 2 view models in 0 hours 0 minutes and 2.74 seconds (2.74s).
+```
+
+---
 ## 2024-12-18
 
 ### Github Actions Integration

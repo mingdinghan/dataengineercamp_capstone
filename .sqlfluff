@@ -1,0 +1,11 @@
+[sqlfluff]
+templater = dbt
+dialect = clickhouse
+
+[sqlfluff:templater:dbt]
+project_dir = transform/dbt/ecommerce_etl
+profiles_dir = transform/dbt/ecommerce_etl
+target = ci
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
