@@ -49,5 +49,5 @@ jobs:
         working-directory: ./transform/dbt/ecommerce_etl
 
       - name: Update dbt models in production
-        run: dbt run
+        run: dbt run --target ${DBT_PROFILE_TARGET}
         working-directory: ./transform/dbt/ecommerce_etl
