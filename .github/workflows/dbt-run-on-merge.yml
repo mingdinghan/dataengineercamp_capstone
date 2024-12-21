@@ -1,0 +1,53 @@
+name: dbt-run-on-merge
+on:
+  # Can be manually triggered
+  workflow_dispatch: {}
+  # Trigger a deploy every time there is a merge to main
+  push:
+    branches:
+      - main
+
+# Set needed env variables
+env:
+  DBT_PROFILE_TARGET: prod
+  PROD_CLICKHOUSE_HOST: ${{ secrets.PROD_CLICKHOUSE_HOST }}
+  PROD_CLICKHOUSE_DATABASE: ${{ secrets.PROD_CLICKHOUSE_DATABASE }}
+  PROD_CLICKHOUSE_USERNAME: ${{ secrets.PROD_CLICKHOUSE_USERNAME }}
+  PROD_CLICKHOUSE_PASSWORD: ${{ secrets.PROD_CLICKHOUSE_PASSWORD }}
+
+jobs:
+  dbt-run-on-merge:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10-bookworm
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout code repository in agent
+        uses: actions/checkout@v4
+        with:
+          set-safe-directory: true
+
+      # https://github.com/actions/runner/issues/2033#issuecomment-1204205989
+      - name: Set ownership
+        run: |
+          # this is to fix GIT not liking owner of the checkout dir
+          chown -R $(id -u):$(id -g) $PWD
+
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ./transform/dbt/requirements.txt
+
+      - name: Install dbt packages
+        run: dbt deps
+        working-directory: ./transform/dbt/ecommerce_etl
+
+      - name: Update dbt models in production
+        run: dbt run
+        working-directory: ./transform/dbt/ecommerce_etl
