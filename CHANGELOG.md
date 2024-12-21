@@ -35,6 +35,16 @@
 # Done. PASS=12 WARN=0 ERROR=0 SKIP=0 TOTAL=12
 ```
 
+- Install and configure sqlfluff for linting
+
+```bash
+sqlfluff lint transform/dbt/ecommerce_etl
+# === [dbt templater] Sorting Nodes...
+# === [dbt templater] Compiling dbt project...
+# === [dbt templater] Project Compiled.
+# All Finished 📜 🎉!
+```
+
 ## 2024-12-20
 
 - Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)
