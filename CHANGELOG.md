@@ -52,6 +52,11 @@ sqlfluff lint transform/dbt/ecommerce_etl
 ![images/cicd_gh_actions_sqlfluff_lint.png](images/cicd_gh_actions_sqlfluff_lint.png)
 
 
+- Run `dbt test` in GitHub Actions
+
+![images/cicd_gh_actions_dbt_test.png](images/cicd_gh_actions_dbt_test.png)
+
+
 ## 2024-12-20
 
 - Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)
