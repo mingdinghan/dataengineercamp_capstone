@@ -1,3 +1,40 @@
+## 2024-12-21
+
+- Add data quality tests
+
+```bash
+# 1 of 12 START test not_null_customers_email .................................... [RUN]
+# 1 of 12 PASS not_null_customers_email .......................................... [PASS in 0.21s]
+# 2 of 12 START test not_null_customers_id ....................................... [RUN]
+# 2 of 12 PASS not_null_customers_id ............................................. [PASS in 0.09s]
+# 3 of 12 START test not_null_customers_name ..................................... [RUN]
+# 3 of 12 PASS not_null_customers_name ........................................... [PASS in 0.03s]
+# 4 of 12 START test not_null_orders_customer_id ................................. [RUN]
+# 4 of 12 PASS not_null_orders_customer_id ....................................... [PASS in 0.02s]
+# 5 of 12 START test not_null_orders_id .......................................... [RUN]
+# 5 of 12 PASS not_null_orders_id ................................................ [PASS in 0.03s]
+# 6 of 12 START test not_null_orders_product_id .................................. [RUN]
+# 6 of 12 PASS not_null_orders_product_id ........................................ [PASS in 0.03s]
+# 7 of 12 START test not_null_products_id ........................................ [RUN]
+# 7 of 12 PASS not_null_products_id .............................................. [PASS in 0.02s]
+# 8 of 12 START test not_null_products_price ..................................... [RUN]
+# 8 of 12 PASS not_null_products_price ........................................... [PASS in 0.03s]
+# 9 of 12 START test not_null_products_title ..................................... [RUN]
+# 9 of 12 PASS not_null_products_title ........................................... [PASS in 0.03s]
+# 10 of 12 START test unique_customers_id ........................................ [RUN]
+# 10 of 12 PASS unique_customers_id .............................................. [PASS in 0.03s]
+# 11 of 12 START test unique_orders_id ........................................... [RUN]
+# 11 of 12 PASS unique_orders_id ................................................. [PASS in 0.03s]
+# 12 of 12 START test unique_products_id ......................................... [RUN]
+# 12 of 12 PASS unique_products_id ............................................... [PASS in 0.02s]
+# 
+# Finished running 12 data tests in 0 hours 0 minutes and 1.49 seconds (1.49s).
+# 
+# Completed successfully
+# 
+# Done. PASS=12 WARN=0 ERROR=0 SKIP=0 TOTAL=12
+```
+
 ## 2024-12-20
 
 - Integrate dbt with ClickHouse following the [instructions here](https://clickhouse.com/docs/en/integrations/dbt)

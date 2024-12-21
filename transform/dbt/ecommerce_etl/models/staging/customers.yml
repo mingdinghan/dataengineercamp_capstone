@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: customers
+    columns:
+      - name: id
+        description: The customer id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: name
+        description: The customer full name
+        data_tests:
+          - not_null
+
+      - name: email
+        description: The customer email
+        data_tests:
+          - not_null
