@@ -49,8 +49,14 @@ Stream Ingestion and Processing
 - Stream-to-stream join queries using ksqldb with a 24-hour window
 ![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
 
-- Preset visualization of ClickHouse data automatically updated with new streaming data
-![images/preset_visualization_02.png](images/preset_visualization_02.png)
+- Preset visualization of ClickHouse data automatically updated with new streaming data and dimensionally-modelled data
+![images/preset_visualization.png](images/preset_visualization.png)
+
+- Lineage of dimensionally-modelled data
+![images/dbt_lineage_graph.png](images/dbt_lineage_graph.png)
+
+- Star-schema Entity-Relationship Diagram
+![images/star_schema_ER_diagram.png](images/star_schema_ER_diagram.png)
 
 CI/CD:
 - On creating/updating a pull request to `main`, run `sqlfluff` linter and `dbt test` pointing to `dev` ClickHouse tables
