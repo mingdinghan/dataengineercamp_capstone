@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: fct_orders
+    columns:
+      - name: order_key
+        description: The surrogate key of the order
+        data_tests:
+          - not_null
+          - unique
+
+      - name: id
+        description: The natural key of the order
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_key
+        description: The surrogate key to the product
+        data_tests:
+          - not_null
+
+      - name: customer_key
+        description: The surrogate key to the customer
+        data_tests:
+          - not_null
+
+      - name: quantity
+        description: The order's quantity
+        data_tests:
+          - not_null
+
+      - name: total_price
+        description: The order's total_price
+        data_tests:
+          - not_null
+
+      - name: created_at
+        description: The timestamp of the order's creation, in UTC
+        data_tests:
+          - not_null

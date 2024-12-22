@@ -1,3 +1,11 @@
+## 2024-12-22
+
+- Add fact and dimension tables
+  - Use `surrogate keys` to provide consumers of the dimensional model with an easy-to-use key to join the fact and dimension tables together, without needing to understand the underlying business context
+
+- [dbt_date](https://hub.getdbt.com/calogica/dbt_date/latest/) does not support ClickHouse
+
+
 ## 2024-12-21
 
 - Configure Continuous Deployment using GitHub Actions
