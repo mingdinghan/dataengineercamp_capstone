@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: dim_customers
+    columns:
+      - name: customer_key
+        description: The surrogate key of the customer
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_id
+        description: The natural key of the customer
+        data_tests:
+          - not_null
+          - unique
+
+      - name: customer_name
+        description: The customer's full name
+        data_tests:
+          - not_null
+
+      - name: customer_email
+        description: The customer email
+        data_tests:
+          - not_null
+
+      - name: customer_address
+        description: The customer's street address
+
+      - name: customer_city
+        description: The customer's city
+
+      - name: customer_state
+        description: The customer's state
+
+      - name: customer_zipcode
+        description: The customer's zipcode
+
+      - name: customer_country
+        description: The customer's country - default to 'US'

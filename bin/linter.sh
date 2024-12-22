@@ -8,7 +8,7 @@ main() {
     dbt deps --project-dir "${TOP_DIR}/transform/dbt/ecommerce_etl"
 
     # Lint SQL
-    sqlfluff fix -f "${TOP_DIR}"/transform/dbt/ecommerce_etl
+    sqlfluff fix "${TOP_DIR}/transform/dbt/ecommerce_etl"
 
     # If the linter produce diffs, fail the linter
     if [ -z "$(git status --porcelain)" ]; then

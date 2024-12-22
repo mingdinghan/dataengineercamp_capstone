@@ -79,7 +79,7 @@
             <li>(Bonus) Advanced fact tables</li>
         </td>
         <td>
-            <li>At least 1 fact table, and 3 dimensional tables: 5%</li>
+            <li>✅ At least 1 fact table, and 3 dimensional tables: 5%</li>
             <li>+ (Bonus) Type 2 Slowly changing dimension (SCD Type 2): 7.5%</li>
             <li>+ (Bonus) Advanced fact tables (snapshot or accumulating fact table): 10%</li>
         </td>

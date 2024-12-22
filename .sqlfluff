@@ -1,6 +1,7 @@
 [sqlfluff]
 templater = dbt
 dialect = clickhouse
+exclude_rules = CP03
 
 [sqlfluff:templater:dbt]
 project_dir = transform/dbt/ecommerce_etl

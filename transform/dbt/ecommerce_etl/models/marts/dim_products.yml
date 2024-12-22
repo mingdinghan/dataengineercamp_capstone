@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: dim_products
+    columns:
+      - name: product_key
+        description: The surrogate key of the product
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_id
+        description: The natural key of the product
+        data_tests:
+          - not_null
+          - unique
+
+      - name: product_title
+        description: The product title
+        data_tests:
+          - not_null
+
+      - name: product_category
+        description: The product category
+        data_tests:
+          - not_null
+
+      - name: product_company
+        description: The name of the company that sells the product
+        data_tests:
+          - not_null
+
+      - name: product_price
+        description: The product price
+        data_tests:
+          - not_null
+
+      - name: product_description
+        description: The product description
+
+      - name: product_color
+        description: The product's color, if available
+
+      - name: product_size
+        description: The product's size, if available
+
+      - name: product_material
+        description: The product's material, if available
