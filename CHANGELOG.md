@@ -5,7 +5,6 @@
 
 - [dbt_date](https://hub.getdbt.com/calogica/dbt_date/latest/) does not support ClickHouse
 
-
 ## 2024-12-21
 
 - Configure Continuous Deployment using GitHub Actions

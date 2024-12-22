@@ -9,33 +9,33 @@ models:
           - not_null
           - unique
 
-      - name: id
+      - name: customer_id
         description: The natural key of the customer
         data_tests:
           - not_null
           - unique
 
-      - name: name
+      - name: customer_name
         description: The customer's full name
         data_tests:
           - not_null
 
-      - name: email
+      - name: customer_email
         description: The customer email
         data_tests:
           - not_null
 
-      - name: address
+      - name: customer_address
         description: The customer's street address
 
-      - name: city
+      - name: customer_city
         description: The customer's city
 
-      - name: state
+      - name: customer_state
         description: The customer's state
 
-      - name: zipcode
+      - name: customer_zipcode
         description: The customer's zipcode
 
-      - name: country
+      - name: customer_country
         description: The customer's country - default to 'US'

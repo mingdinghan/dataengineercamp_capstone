@@ -30,6 +30,15 @@ t.b.d
 source .env
 ```
 
+Build and Run dbt models
+```bash
+dbt run --project-dir transform/dbt/ecommerce_etl --profiles-dir transform/dbt/ecommerce_etl
+
+dbt test --project-dir transform/dbt/ecommerce_etl --profiles-dir transform/dbt/ecommerce_etl
+
+sqlfluff lint  .
+```
+
 ### Selected Screenshots
 (more details in [CHANGELOG.md](CHANGELOG.md))
 
