@@ -158,9 +158,9 @@
             <li>README file at the root of the repository explaining the project context, architecture and installation/running instructions. See <a href="https://github.com/matiassingers/awesome-readme">here</a> for examples.</li>
         </td>
         <td>
-            <li>Clear project structure: 2.5%</li>
-            <li>Code documentation using Python or SQL comments where reasonable: 2.5%</li>
-            <li>Detailed markdown documentation explaining the project context, architecture and installation/running instructions: 5%</li>
+            <li>✅ Clear project structure: 2.5%</li>
+            <li>✅ Code documentation using Python or SQL comments where reasonable: 2.5%</li>
+            <li>✅ Detailed markdown documentation explaining the project context, architecture and installation/running instructions: 5%</li>
         </td>
     </tr>
 </table>
