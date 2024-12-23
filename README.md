@@ -135,12 +135,18 @@ What users would find your dataset useful?
 ### 4. Streaming data into ClickHouse via Kafka connector
 
 - [Sign up](https://clickhouse.com/) for a ClickHouse trial.
-- Create the following tables in ClickHouse's `default` database - the queries to create these are in the `warehouse/clickhouse/table-definitions` folder:
+- Create a ClickHouse database `ecommerce_etl_dev`
+  ```bash
+  CREATE DATABASE ecommerce_etl_dev
+  ```
+- Create the following tables - the queries to create these are in the `warehouse/clickhouse/table-definitions` folder:
   - `products`
   - `customers`
   - `orders`
+  - `shipments`
 - For each of the above tables, create a Clickpipe using the Kafka cluster credentials and bootstrap server URL in the Confluent Cloud UI
   ![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+  - Note: the `shipments`, `shipment_dispatches` and `shipment_completions` topics in Kafka can all be mapped to the `shipments` table in ClickHouse, as these follow the same schema and are meant for accumulating fact tables.
 - After the data in Kafka has been populated, you can run some example queries in the `warehouse/clickhouse/queries` folder
   - These queries will also be materialized via dbt as `intermediate` models in a later section
 
