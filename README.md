@@ -50,8 +50,8 @@ What users would find your dataset useful?
   docker run \
     --rm -it \
     -v ${PWD}/.env:/app/.env \
-    -v ${PWD}/datagen/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
-        materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+    -v ${PWD}/datagen/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
+        materialize/datagen -s ecommerce_bootstrap_shops_and_customers.json -n 1
   ```
 
 - Verify that new records are generated in the respective topics in the Kafka cluster in Confluent Cloud
@@ -63,8 +63,8 @@ What users would find your dataset useful?
   docker run \
     --rm -it \
     -v ${PWD}/.env:/app/.env \
-    -v ${PWD}/datagen/ecommerce_orders.json:/app/ecommerce_orders.json \
-        materialize/datagen -s ecommerce_orders.json -n ${num_orders}
+    -v ${PWD}/datagen/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+        materialize/datagen -s ecommerce_orders_recent.json -n ${num_orders}
   ```
 
 ### 3. Data generation from Cloud instance (EC2 instance in AWS)
@@ -77,8 +77,8 @@ What users would find your dataset useful?
 
 - Copy the following files into the EC2 instance in the `$HOME` directory
   - `.env` file
-  - `datagen/ecommerce_bootstrapped_data.json`
-  - `datagen/ecommerce_orders.json`
+  - `datagen/ecommerce_bootstrap_shops_and_customers.json`
+  - `datagen/ecommerce_orders_recent.json`
 
 - Pull the container image from Dockerhub
   ```bash
@@ -89,13 +89,13 @@ What users would find your dataset useful?
   ```bash
   docker run \
   -v ${PWD}/.env:/app/.env \
-  -v ${PWD}/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
-      materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+  -v ${PWD}/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
+      materialize/datagen -s ecommerce_bootstrap_shops_and_customers.json -n 1
 
   docker run \
   -v ${HOME}/.env:/app/.env \
-  -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
-      materialize/datagen -s ecommerce_orders.json -n 50
+  -v ${HOME}/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+      materialize/datagen -s ecommerce_orders_recent.json -n 50
   ```
 
 - To automate this data generation, create a Shell script and schedule it to produce data periodically
@@ -103,16 +103,16 @@ What users would find your dataset useful?
     ```bash
     now="$(date +"%T")"
     echo "Current Time: $now"
-    echo "Running 'datagen ecommerce_orders.json'"
+    echo "Running 'datagen ecommerce_orders_recent.json'"
 
     #!/usr/bin/env bash
 
-    num_orders=$((1 + RANDOM % 100))
+    num_orders=$((1 + RANDOM % 20))
 
     docker run \
       -v ${HOME}/.env:/app/.env \
-      -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
-          materialize/datagen -s ecommerce_orders.json -n ${num_orders}
+      -v ${HOME}/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+          materialize/datagen -s ecommerce_orders_recent.json -n ${num_orders}
 
     echo "All done"
     ```
