@@ -27,7 +27,13 @@ What users would find your dataset useful?
 
 ### Solution Architecture
 
-![images/solution_architecture.jpg](images/solution_architecture.jpg)
+![images/solution_architecture.png](images/solution_architecture.png)
+
+### Visualization Dashboard - Streaming and Batch Reports
+
+![images/preset_visualization_01.png](images/preset_visualization_01.png)
+![images/preset_visualization_02.png](images/preset_visualization_02.png)
+
 
 ### 1. Setting up Confluent Cloud
 
@@ -186,22 +192,17 @@ sqlfluff lint transform/dbt/ecommerce_etl
 
 - [Sign up](https://preset.io/) for a Preset trial
 - Over in ClickHouse, obtain the connection credentials to your target database and configure a new Preset database connection to point to ClickHouse
-
-  ![images/preset_clickhouse_integration.png](images/preset_clickhouse_integration.png)
 - Create a dataset for the `report_orders` table (one big table) which serves as the semantic layer to explore the various facts and dimensions of the `orders` model
 - Create a Preset dashboard and some charts to generate reports. Example charts:
   - total revenue sliced by `product_id` over time (monthly grain)
   - total revenue per `customer_id`
   - total quantity of products purchased per `customer_id`
-
 - Preset visualization of ClickHouse data can be configured to be automatically refreshed with new streaming data and dimensionally-modelled data
-
-  ![images/preset_visualization.png](images/preset_visualization.png)
 
 ### Selected Screenshots
 (more details in [CHANGELOG.md](CHANGELOG.md))
 
-Stream Ingestion and Processing
+#### Stream Ingestion and Processing
 - Stream ingestion of `orders` into Kafka cluster in Confluent Cloud
 
   ![images/ccloud_orders.png](images/ccloud_orders.png)
@@ -210,7 +211,8 @@ Stream Ingestion and Processing
 
   ![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
 
-- Lineage of dimensionally-modelled data
+#### Dimensional Modeling
+- Data Lineage
 
   ![images/dbt_lineage_graph.png](images/dbt_lineage_graph.png)
 
@@ -218,11 +220,8 @@ Stream Ingestion and Processing
 
   ![images/star_schema_ER_diagram.png](images/star_schema_ER_diagram.png)
 
-CI/CD:
+#### Continuous Integration / Continuous Deployment
 - On creating/updating a pull request to `main`, run `sqlfluff` linter and `dbt test` pointing to `dev` ClickHouse tables
-
-  ![images/cicd_gh_actions_dbt_test.png](images/cicd_gh_actions_dbt_test.png)
-
 - On merge to `main`, run `dbt run --target prod` to update `prod` ClickHouse tables
 
-  ![images/cicd_gh_actions_dbt-run-on-merge.png](images/cicd_gh_actions_dbt-run-on-merge.png)
+  ![images/cicd_gh_actions.png](images/cicd_gh_actions.png)
