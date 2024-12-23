@@ -16,4 +16,6 @@ left join
     on fct_orders.customer_key = dim_customers.customer_key
 inner join
     {{ ref('dim_shipments') }} as dim_shipments
-    on fct_orders.shipment_key = dim_shipments.shipment_key and dim_shipments.shipping_status = 1
+    on
+        fct_orders.shipment_key = dim_shipments.shipment_key
+        and dim_shipments.shipping_status = 1
