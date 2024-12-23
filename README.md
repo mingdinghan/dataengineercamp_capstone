@@ -16,11 +16,12 @@ It demonstrates designing streaming data pipelines and an analytical data wareho
 
 Business process modeling
 - We model the e-commerce orders creation business process to ingest, process and visualize real-time orders and total revenue over time, segmented by
-  - top products and categories
-  - top customers
+  - products and categories
+  - customers
 
 What users would find your dataset useful?
   - for the Finance and Operations departments, provide a sales report of the orders over time. Provide the ability to slice by product name, product category and product supplier.
+  - for the Operations department, provide a report of the shipping delay from order creation to shipping completion.
   - for the Marketing department, provide a report of the customers who generated the most revenue to create marketing campaigns and loyalty programmes.
   - for the Analytics department, provide raw and modelled data to build machine learning models to provide recommendations to customers to maximise total lifetime value.
 
@@ -32,7 +33,7 @@ What users would find your dataset useful?
 
 - [Sign up](https://confluent.cloud/signup) for a free Confluent trial
 - Create a Kafka cluster in Confluent Cloud and generate an API key
-- Create topics `products`, `orders`, `customers` and `shops`
+- Create topics `products`, `orders`, `customers`, `shipments`, and `shops`
 - Clone `.env.example` into `.env` and fill in the Kafka cluster credentials
   ```bash
   source .env
@@ -45,7 +46,7 @@ What users would find your dataset useful?
   docker pull materialize/datagen
   ```
 
-- Produce the bootstrapped `products`, `customers` and `orders` records
+- Produce the bootstrapped `products` and `customers` records (100 products and 50 customers)
   ```bash
   docker run \
     --rm -it \

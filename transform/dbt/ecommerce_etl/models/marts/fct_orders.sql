@@ -1,5 +1,6 @@
 SELECT
     {{ dbt_utils.generate_surrogate_key(['orders.id']) }} AS order_key,
+    {{ dbt_utils.generate_surrogate_key(['orders.id']) }} AS shipment_key,
     {{ dbt_utils.generate_surrogate_key(['orders.product_id']) }}
         AS product_key,
     {{ dbt_utils.generate_surrogate_key(['orders.customer_id']) }}
