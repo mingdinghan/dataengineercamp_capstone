@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: dim_shipments
+    columns:
+      - name: shipment_key
+        description: The surrogate key of the shipment
+        data_tests:
+          - not_null
+
+      - name: shipping_vendor_id
+        description: The shipment vendor_id
+        data_tests:
+          - not_null
+
+      - name: shipping_status
+        description: The shipment status
+        data_tests:
+          - not_null
+
+      - name: shipping_method_id
+        description: The shipment shipping_method_id
+        data_tests:
+          - not_null
+
+      - name: shipping_cost
+        description: The shipment shipping cost
+        data_tests:
+          - not_null
+
+      - name: shipped_at
+        description: The shipment start time
+        data_tests:
+          - not_null
+
+      - name: shipped_date
+        description: The shipment start date
+        data_tests:
+          - not_null

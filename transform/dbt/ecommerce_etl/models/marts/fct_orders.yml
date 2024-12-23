@@ -25,6 +25,11 @@ models:
         data_tests:
           - not_null
 
+      - name: shipment_key
+        description: The surrogate key to the shipment
+        data_tests:
+          - not_null
+
       - name: order_quantity
         description: The order's quantity
         data_tests:

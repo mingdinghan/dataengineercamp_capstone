@@ -1,0 +1,72 @@
+[
+    {
+        "_meta": {
+            "topic": "orders",
+            "key": "id",
+            "relationships": [
+                {
+                    "topic": "shipments",
+                    "parent_field": "id",
+                    "child_field": "order_id",
+                    "records_per": 1
+                }
+            ]
+        },
+        "id": "faker.string.uuid()",
+        "product_id": "faker.helpers.rangeToNumber({ min: 1, max: 100 })",
+        "customer_id":  "faker.helpers.rangeToNumber({ min: 1, max: 50 })",
+        "quantity": "faker.helpers.rangeToNumber({ min: 1, max: 10 })",
+        "total_price": "faker.commerce.price({ min: 10, max: 250})",
+        "created_at": "faker.date.between({ from: '2024-01-01T00:00:00.000Z', to: '2024-01-10T00:00:00.000Z' })"
+    },
+    {
+        "_meta": {
+            "topic": "shipments",
+            "key": "order_id",
+            "relationships": [
+                {
+                    "topic": "shipment_dispatches",
+                    "parent_field": "order_id",
+                    "child_field": "order_id",
+                    "records_per": 1
+                },
+                {
+                    "topic": "shipment_completions",
+                    "parent_field": "order_id",
+                    "child_field": "order_id",
+                    "records_per": 1
+                }
+            ]
+        },
+        "revision_number": "faker.helpers.rangeToNumber({ min: 1, max: 1 })",
+        "status": "faker.helpers.rangeToNumber({ min: 1, max: 1 })",
+        "vendor_id": "faker.helpers.rangeToNumber({ min: 1, max: 8 })",
+        "shipping_method_id": "faker.helpers.rangeToNumber({ min: 1, max: 3 })",
+        "cost": "faker.commerce.price({ min: 20, max: 100})",
+        "modified_at": "faker.date.between({ from: '2024-01-11T00:00:00.000Z', to: '2024-01-15T00:00:00.000Z' })"
+    },
+    {
+        "_meta": {
+            "topic": "shipment_dispatches",
+            "key": "order_id"
+        },
+        "revision_number": "faker.helpers.rangeToNumber({ min: 2, max: 2 })",
+        "status": "faker.helpers.rangeToNumber({ min: 2, max: 2 })",
+        "vendor_id": "faker.helpers.rangeToNumber({ min: 0, max: 0 })",
+        "shipping_method_id": "faker.helpers.rangeToNumber({ min: 0, max: 0 })",
+        "cost": "faker.commerce.price({ min: 0, max: 0})",
+        "modified_at": "faker.date.between({ from: '2024-01-16T00:00:00.000Z', to: '2024-01-20T00:00:00.000Z' })"
+    },
+    {
+        "_meta": {
+            "topic": "shipment_completions",
+            "key": "order_id"
+        },
+        "revision_number": "faker.helpers.rangeToNumber({ min: 3, max: 3 })",
+        "status": "faker.helpers.rangeToNumber({ min: 3, max: 3 })",
+        "vendor_id": "faker.helpers.rangeToNumber({ min: 0, max: 0 })",
+        "shipping_method_id": "faker.helpers.rangeToNumber({ min: 0, max: 0 })",
+        "cost": "faker.commerce.price({ min: 0, max: 0})",
+        "modified_at": "faker.date.between({ from: '2024-01-21T00:00:00.000Z', to: '2024-01-28T00:00:00.000Z' })"
+    }
+]

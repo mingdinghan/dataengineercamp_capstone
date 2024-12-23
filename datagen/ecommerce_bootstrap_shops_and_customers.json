@@ -8,33 +8,25 @@
                     "topic": "products",
                     "parent_field": "product_ids",
                     "child_field": "id",
-                    "records_per": 10
+                    "records_per": 100
                 },
                 {
                     "topic": "customers",
                     "parent_field": "customer_ids",
                     "child_field": "id",
-                    "records_per": 3
+                    "records_per": 50
                 }
             ]
         },
         "id": "faker.number.int(100)",
         "name": "faker.company.name()",
-        "product_ids": "faker.helpers.multiple((_, i) => i+1, {count: 10})",
-        "customer_ids": "faker.helpers.multiple((_, i) => i+1, {count: 3})"
+        "product_ids": "faker.helpers.multiple((_, i) => i+1, {count: 100})",
+        "customer_ids": "faker.helpers.multiple((_, i) => i+1, {count: 50})"
     },
     {
         "_meta": {
             "topic": "products",
-            "key": "id",
-            "relationships": [
-                {
-                    "topic": "orders",
-                    "parent_field": "id",
-                    "child_field": "product_id",
-                    "records_per": 5
-                }
-            ]
+            "key": "id"
         },
         "id": "this string can be anything since this field is determined by product.id",
         "title": "faker.commerce.productName()",
@@ -49,15 +41,7 @@
     {
         "_meta": {
             "topic": "customers",
-            "key": "id",
-            "relationships": [
-                {
-                    "topic": "orders",
-                    "parent_field": "id",
-                    "child_field": "customer_id",
-                    "records_per": 4
-                }
-            ]
+            "key": "id"
         },
         "id": "this string can be anything since this field is determined by customer.id",
         "name": "faker.person.fullName()",
@@ -66,17 +50,5 @@
         "city": "faker.location.city()",
         "state": "faker.location.state()",
         "zipcode": "faker.location.zipCode()"
-    },
-    {
-        "_meta": {
-            "topic": "orders",
-            "key": "id"
-        },
-        "id": "faker.string.uuid()",
-        "product_id": "faker.helpers.rangeToNumber({ min: 1, max: 10 })",
-        "customer_id":  "faker.helpers.rangeToNumber({ min: 1, max: 3 })",
-        "quantity": "faker.helpers.rangeToNumber({ min: 1, max: 10 })",
-        "total_price": "faker.commerce.price({ min: 10, max: 250})",
-        "created_at": "faker.date.past({ days: 30, refDate: '2024-01-01T00:00:00.000Z' })"
     }
 ]

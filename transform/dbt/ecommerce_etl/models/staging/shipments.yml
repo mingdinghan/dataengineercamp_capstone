@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: shipments
+    columns:
+      - name: order_id
+        description: The shipment order_id
+        data_tests:
+          - not_null
+
+      - name: revision_number
+        description: The shipment revision number
+        data_tests:
+          - not_null
+
+      - name: status
+        description: The shipment status
+        data_tests:
+          - not_null

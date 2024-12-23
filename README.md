@@ -16,23 +16,30 @@ It demonstrates designing streaming data pipelines and an analytical data wareho
 
 Business process modeling
 - We model the e-commerce orders creation business process to ingest, process and visualize real-time orders and total revenue over time, segmented by
-  - top products and categories
-  - top customers
+  - products and categories
+  - customers
 
 What users would find your dataset useful?
   - for the Finance and Operations departments, provide a sales report of the orders over time. Provide the ability to slice by product name, product category and product supplier.
+  - for the Operations department, provide a report of the shipping delay from order creation to shipping completion.
   - for the Marketing department, provide a report of the customers who generated the most revenue to create marketing campaigns and loyalty programmes.
   - for the Analytics department, provide raw and modelled data to build machine learning models to provide recommendations to customers to maximise total lifetime value.
 
 ### Solution Architecture
 
-![images/solution_architecture.jpg](images/solution_architecture.jpg)
+![images/solution_architecture.png](images/solution_architecture.png)
+
+### Visualization Dashboard - Streaming and Batch Reports
+
+![images/preset_visualization_01.png](images/preset_visualization_01.png)
+![images/preset_visualization_02.png](images/preset_visualization_02.png)
+
 
 ### 1. Setting up Confluent Cloud
 
 - [Sign up](https://confluent.cloud/signup) for a free Confluent trial
 - Create a Kafka cluster in Confluent Cloud and generate an API key
-- Create topics `products`, `orders`, `customers` and `shops`
+- Create topics `products`, `orders`, `customers`, `shipments`, and `shops`
 - Clone `.env.example` into `.env` and fill in the Kafka cluster credentials
   ```bash
   source .env
@@ -45,13 +52,13 @@ What users would find your dataset useful?
   docker pull materialize/datagen
   ```
 
-- Produce the bootstrapped `products`, `customers` and `orders` records
+- Produce the bootstrapped `products` and `customers` records (100 products and 50 customers)
   ```bash
   docker run \
     --rm -it \
     -v ${PWD}/.env:/app/.env \
-    -v ${PWD}/datagen/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
-        materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+    -v ${PWD}/datagen/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
+        materialize/datagen -s ecommerce_bootstrap_shops_and_customers.json -n 1
   ```
 
 - Verify that new records are generated in the respective topics in the Kafka cluster in Confluent Cloud
@@ -63,8 +70,8 @@ What users would find your dataset useful?
   docker run \
     --rm -it \
     -v ${PWD}/.env:/app/.env \
-    -v ${PWD}/datagen/ecommerce_orders.json:/app/ecommerce_orders.json \
-        materialize/datagen -s ecommerce_orders.json -n ${num_orders}
+    -v ${PWD}/datagen/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+        materialize/datagen -s ecommerce_orders_recent.json -n ${num_orders}
   ```
 
 ### 3. Data generation from Cloud instance (EC2 instance in AWS)
@@ -77,8 +84,8 @@ What users would find your dataset useful?
 
 - Copy the following files into the EC2 instance in the `$HOME` directory
   - `.env` file
-  - `datagen/ecommerce_bootstrapped_data.json`
-  - `datagen/ecommerce_orders.json`
+  - `datagen/ecommerce_bootstrap_shops_and_customers.json`
+  - `datagen/ecommerce_orders_recent.json`
 
 - Pull the container image from Dockerhub
   ```bash
@@ -89,13 +96,13 @@ What users would find your dataset useful?
   ```bash
   docker run \
   -v ${PWD}/.env:/app/.env \
-  -v ${PWD}/ecommerce_bootstrapped_data.json:/app/ecommerce_bootstrapped_data.json \
-      materialize/datagen -s ecommerce_bootstrapped_data.json -n 1
+  -v ${PWD}/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
+      materialize/datagen -s ecommerce_bootstrap_shops_and_customers.json -n 1
 
   docker run \
   -v ${HOME}/.env:/app/.env \
-  -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
-      materialize/datagen -s ecommerce_orders.json -n 50
+  -v ${HOME}/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+      materialize/datagen -s ecommerce_orders_recent.json -n 50
   ```
 
 - To automate this data generation, create a Shell script and schedule it to produce data periodically
@@ -103,16 +110,16 @@ What users would find your dataset useful?
     ```bash
     now="$(date +"%T")"
     echo "Current Time: $now"
-    echo "Running 'datagen ecommerce_orders.json'"
+    echo "Running 'datagen ecommerce_orders_recent.json'"
 
     #!/usr/bin/env bash
 
-    num_orders=$((1 + RANDOM % 100))
+    num_orders=$((1 + RANDOM % 20))
 
     docker run \
       -v ${HOME}/.env:/app/.env \
-      -v ${HOME}/ecommerce_orders.json:/app/ecommerce_orders.json \
-          materialize/datagen -s ecommerce_orders.json -n ${num_orders}
+      -v ${HOME}/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
+          materialize/datagen -s ecommerce_orders_recent.json -n ${num_orders}
 
     echo "All done"
     ```
@@ -135,12 +142,18 @@ What users would find your dataset useful?
 ### 4. Streaming data into ClickHouse via Kafka connector
 
 - [Sign up](https://clickhouse.com/) for a ClickHouse trial.
-- Create the following tables in ClickHouse's `default` database - the queries to create these are in the `warehouse/clickhouse/table-definitions` folder:
+- Create a ClickHouse database `ecommerce_etl_dev`
+  ```bash
+  CREATE DATABASE ecommerce_etl_dev
+  ```
+- Create the following tables - the queries to create these are in the `warehouse/clickhouse/table-definitions` folder:
   - `products`
   - `customers`
   - `orders`
+  - `shipments`
 - For each of the above tables, create a Clickpipe using the Kafka cluster credentials and bootstrap server URL in the Confluent Cloud UI
   ![images/clickhouse_clickpipes_confluent.png](images/clickhouse_clickpipes_confluent.png)
+  - Note: the `shipments`, `shipment_dispatches` and `shipment_completions` topics in Kafka can all be mapped to the `shipments` table in ClickHouse, as these follow the same schema and are meant for accumulating fact tables.
 - After the data in Kafka has been populated, you can run some example queries in the `warehouse/clickhouse/queries` folder
   - These queries will also be materialized via dbt as `intermediate` models in a later section
 
@@ -179,22 +192,17 @@ sqlfluff lint transform/dbt/ecommerce_etl
 
 - [Sign up](https://preset.io/) for a Preset trial
 - Over in ClickHouse, obtain the connection credentials to your target database and configure a new Preset database connection to point to ClickHouse
-
-  ![images/preset_clickhouse_integration.png](images/preset_clickhouse_integration.png)
 - Create a dataset for the `report_orders` table (one big table) which serves as the semantic layer to explore the various facts and dimensions of the `orders` model
 - Create a Preset dashboard and some charts to generate reports. Example charts:
   - total revenue sliced by `product_id` over time (monthly grain)
   - total revenue per `customer_id`
   - total quantity of products purchased per `customer_id`
-
 - Preset visualization of ClickHouse data can be configured to be automatically refreshed with new streaming data and dimensionally-modelled data
-
-  ![images/preset_visualization.png](images/preset_visualization.png)
 
 ### Selected Screenshots
 (more details in [CHANGELOG.md](CHANGELOG.md))
 
-Stream Ingestion and Processing
+#### Stream Ingestion and Processing
 - Stream ingestion of `orders` into Kafka cluster in Confluent Cloud
 
   ![images/ccloud_orders.png](images/ccloud_orders.png)
@@ -203,7 +211,8 @@ Stream Ingestion and Processing
 
   ![images/ksqldb_streaming_joins.png](images/ksqldb_streaming_joins.png)
 
-- Lineage of dimensionally-modelled data
+#### Dimensional Modeling
+- Data Lineage
 
   ![images/dbt_lineage_graph.png](images/dbt_lineage_graph.png)
 
@@ -211,11 +220,8 @@ Stream Ingestion and Processing
 
   ![images/star_schema_ER_diagram.png](images/star_schema_ER_diagram.png)
 
-CI/CD:
+#### Continuous Integration / Continuous Deployment
 - On creating/updating a pull request to `main`, run `sqlfluff` linter and `dbt test` pointing to `dev` ClickHouse tables
-
-  ![images/cicd_gh_actions_dbt_test.png](images/cicd_gh_actions_dbt_test.png)
-
 - On merge to `main`, run `dbt run --target prod` to update `prod` ClickHouse tables
 
-  ![images/cicd_gh_actions_dbt-run-on-merge.png](images/cicd_gh_actions_dbt-run-on-merge.png)
+  ![images/cicd_gh_actions.png](images/cicd_gh_actions.png)
