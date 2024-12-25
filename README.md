@@ -1,6 +1,11 @@
 ## An e-commerce streaming analytics Demo
 
 ### Introduction
+
+Demo video walkthrough:
+
+[![Capstone Project demo video](https://img.youtube.com/vi/9ws8jbodAaI/0.jpg)](https://www.youtube.com/watch?v=9ws8jbodAaI)
+
 This was my Capstone Project for the [Data Engineering Bootcamp](https://dataengineercamp.com/), to create a streaming ELT pipeline using Kafka, Confluent Cloud, ClickHouse, dbt and Preset.
 
 It demonstrates designing streaming data pipelines and an analytical data warehouse for an e-commerce store.
