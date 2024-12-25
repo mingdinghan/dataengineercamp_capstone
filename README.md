@@ -74,31 +74,52 @@ What users would find your dataset useful?
         materialize/datagen -s ecommerce_orders_recent.json -n ${num_orders}
   ```
 
-### 3. Data generation from Cloud instance (EC2 instance in AWS)
+### 3. Data generation from Cloud machine (EC2 instance in AWS)
 
-- An initial attempt was made to upload the pre-built [Docker container image](https://hub.docker.com/r/materialize/datagen/tags) to ECR, in order to run the container in an ECS task.
-  - However this was not successful. Instead, I logged into the EC2 instance backing the ECS cluster to perform the following steps.
-  - These steps should also work if you provision an EC2 instance from scratch
-    - The AMI should be an Amazon Linux 2 AMI, with kernel 5.10 and ARM architecture
-    - a `t4-micro` instance on the free-tier should suffice
+- Provision an EC2 instance in AWS
+  - The AMI should be an Amazon Linux 2 AMI, with kernel 5.10 and ARM architecture
+  - A `t4g.micro` instance on the free-tier should suffice
+  - Install `docker` on the EC2 instance. Reference: [How to install Docker on Amazon Linux 2](https://www.cyberciti.biz/faq/how-to-install-docker-on-amazon-linux-2/)
+  - Optional Reference: [How to Install Postgresql 14 on EC2 Amazon linux 2](https://linux.how2shout.com/how-to-install-postgresql-14-on-ec2-amazon-linux-2/)
 
-- Copy the following files into the EC2 instance in the `$HOME` directory
-  - `.env` file
-  - `datagen/ecommerce_bootstrap_shops_and_customers.json`
-  - `datagen/ecommerce_orders_recent.json`
+- Copy the following files into the EC2 instance in the `$HOME` directory in EC2 instance
+  ```bash
+  scp -i ~/.ssh/global-economic-monitor-cluster-keypair.pem .env \
+    ec2-user@${EC2_INSTANCE_PUBLIC_DNS_URL}:/home/ec2-user
 
-- Pull the container image from Dockerhub
+  scp -i ~/.ssh/global-economic-monitor-cluster-keypair.pem datagen/*.json \
+    ec2-user@${EC2_INSTANCE_PUBLIC_DNS_URL}:/home/ec2-user
+  ```
+
+- Pull the pre-built [Docker container image](https://hub.docker.com/r/materialize/datagen/tags) from DockerHub
   ```bash
   docker pull materialize/datagen
   ```
 
-- verify that the Docker container can be used to produce data to Confluent Cloud (similar to how it was done on local machine)
+- Verify that the Docker container can be used to produce data to Confluent Cloud
+  - Generate bootstrapped data for some shops and customers
   ```bash
   docker run \
-  -v ${PWD}/.env:/app/.env \
-  -v ${PWD}/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
+  -v ${HOME}/.env:/app/.env \
+  -v ${HOME}/ecommerce_bootstrap_shops_and_customers.json:/app/ecommerce_bootstrap_shops_and_customers.json \
       materialize/datagen -s ecommerce_bootstrap_shops_and_customers.json -n 1
+  ```
 
+  - Generate seed data for some orders and shipments for the month of `2024-01`.
+  ```bash
+  docker run \
+  -v ${HOME}/.env:/app/.env \
+  -v ${HOME}/ecommerce_orders_shipments_202401.json:/app/ecommerce_orders_shipments_202401.json \
+      materialize/datagen -s ecommerce_orders_shipments_202401.json -n 500
+  ```
+
+  - To generate data for different months, clone and update the `ecommerce_orders_shipments_202401.json` file.
+  ```bash
+  cat ecommerce_orders_shipments_202401.json  | sed 's\2024-01\2024-02\g' > ecommerce_orders_shipments_202402.json
+  ```
+
+  - Generate data for some recent orders in the past few days
+  ```bash
   docker run \
   -v ${HOME}/.env:/app/.env \
   -v ${HOME}/ecommerce_orders_recent.json:/app/ecommerce_orders_recent.json \
@@ -137,7 +158,9 @@ What users would find your dataset useful?
 
   - Verify that the Kafka cluster sees new orders produced every 2 minutes
 
-  - The above steps effectively simulate a periodic ECS task that runs a Docker container to produce to Confluent Cloud, or a Confluent `Datagen Source` connector, but with more customizable and realistic-looking data.
+  - The above setup produces data periodically to Confluent Cloud
+    - This effectively simulates a periodic ECS task, or a Confluent `Datagen Source` Kafka connector
+    - But generates more customizable and realistic-looking data
 
 ### 4. Streaming data into ClickHouse via Kafka connector
 
